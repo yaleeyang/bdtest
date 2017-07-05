@@ -3,6 +3,7 @@ import os
 import csv
 import json
 import redis
+import urllib
 
 data = []
 pointer = 1
@@ -24,7 +25,7 @@ geojson = {
 
 files = os.listdir('./sh_data')
 
-rd_path = '/root/sunny/rd_data/'
+rd_path = './rd_data/'
 rd_files = os .listdir(rd_path)
 
 deviceList = []
