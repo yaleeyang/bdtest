@@ -109,7 +109,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
                                 json_v['lat'] = "{}".format(fields[3])
                                 json_v['lng'] = "{}".format(fields[4])
                                 json_v['value'] = 1
-                                json_v['type'] ="{}".format(fields[len(fields)])
+                                json_v['type'] ="{}".format(fields[len(fields)-1])
                                 geojson_v.append(json_v)
 
         message = json.dumps(geojson_v)
