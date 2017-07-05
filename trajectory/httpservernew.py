@@ -98,9 +98,12 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             for device in rd_files :
                 deviceRequest.append(device)
             if '?' in self.path :#args exists
-                request_arg = str(urllib.parse.unquote(self.path.split('?', 1)[1]))
+                request_args = str(urllib.parse.unquote(self.path.split('?', 1)[1])).split("&")
+                dataId = request_args[len(request_args)-1]
+                if('dataId' in dataId):#
+                    request_arg=dataId.split("=")[1]
             for device in deviceRequest:
-                if (len(request_arg)!=0 and request_arg.split("=")[1] in device):
+                if (len(request_arg)!=0 and request_arg in device ):
                     with open(rd_path+device,'r') as f:
                         for line in f:
                             fields = line.split(",")
