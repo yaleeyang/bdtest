@@ -3,6 +3,7 @@ import os
 import csv
 import json
 import redis
+import urllib
 
 data = []
 pointer = 1
@@ -23,6 +24,9 @@ geojson = {
 }
 
 files = os.listdir('./sh_data')
+
+rd_path = './rd_data/'
+rd_files = os .listdir(rd_path)
 
 deviceList = []
 for file in files:
@@ -84,6 +88,32 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         message = json.dumps(geojson_v)
         self.wfile.write(bytes(message, "utf8"))
         pointer += step
+
+
+    def getFilesData(self):
+        geojson_v=[]
+        request_arg='21'
+        if(len(rd_files) != 0):
+            deviceRequest = []
+            for device in rd_files :
+                deviceRequest.append(device)
+            if '?' in self.path :#args exists
+                request_arg = str(urllib.parse.unquote(self.path.split('?', 1)[1]))
+            for device in deviceRequest:
+                if (len(request_arg)!=0 and request_arg.split("=")[1] in device):
+                    with open(rd_path+device,'r') as f:
+                        for line in f:
+                            fields = line.split(",")
+                            if(fields[1].isdigit()):  #id exsist
+                                json_v={}
+                                json_v['lat'] = "{}".format(fields[3])
+                                json_v['lng'] = "{}".format(fields[4])
+                                json_v['value'] = 1
+                                json_v['type'] ="{}".format(fields[len(fields)])
+                                geojson_v.append(json_v)
+
+        message = json.dumps(geojson_v)
+        self.wfile.write(bytes(message,"utf8"))
 
     # GET
     def do_GET(self):
