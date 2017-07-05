@@ -134,6 +134,8 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             self.getRedisData()
         elif (self.path.startswith('/bubble')):
             self.getRedisData1()
+        elif (self.path.startswith('/road')):
+            self.getFilesData()
 
 
         # Send message back to client
