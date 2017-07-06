@@ -111,8 +111,9 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
                                 json_v={}
                                 json_v['lat'] = "{}".format(fields[3])
                                 json_v['lng'] = "{}".format(fields[4])
-                                json_v['value'] = 1
-                                json_v['type'] ="{}".format(fields[len(fields)-1])
+                                #set trajectory color and point size
+                                json_v['value'] = "{}".format(fields[len(fields)-2])
+                                json_v['type'] ="{}".format(fields[len(fields)-1].replace('\n',''))
                                 geojson_v.append(json_v)
 
         message = json.dumps(geojson_v)
