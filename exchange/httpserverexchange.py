@@ -4,7 +4,7 @@ import csv
 import json
 import simplejson
 #from .AESCipher import AESCipher
-
+from exchange.test.GE import ImitateGE
 port = 9875
 
 dataexchange = [
@@ -34,12 +34,22 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         self._set_headers()
         self.data_string = self.rfile.read(int(self.headers['Content-Length']))
-
+        val = self.headers['Content-Length']
         self.send_response(200)
         self.end_headers()
 
-        data = simplejson.loads(self.data_string)
-        print(data['test'])
+        if self.path.startswith('/bd/consumer'):
+            if '?' in self.path:
+                key = self.path.split('=')[1].strip()
+                ImitateGE.decryptYiKaData(self, YK_data=self.data_string, Key=key)
+        elif self.path.startswith('/bd/producer'):
+            if '?' in self.path:
+                key=self.path.split('=')[1]
+                ImitateGE.decryptBirthdayData(self,BM_data=self.data_string,BKey=key)
+
+        # data = simplejson.loads(self.data_string)
+        # print(data['test'])
+
         return
 
     def end_headers(self):
