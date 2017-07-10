@@ -1,29 +1,31 @@
 import json
-import urllib
+import urllib.request
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 import simplejson
 
 from exchange.AESCipher import AESCipher
-
+from exchange.test.Logger import log
 
 port = 9875
 
 dataexchange = [
     {
         "consumer": {
+            "ip":"",
             "url": "/bd/consumer?apikey=",
             "key": "f12793c2-7f0f-49d8-8151-0129596ae91b",
             "secrete": "4mA1y7U3xKhXAwB3D4CRqmS6ie88XQmi"
         },
         "producer": {
+            "ip":"http://0.0.0.0:9874",
             "url": "/bd/producer?apikey=",
             "key": "cdcd8132-ae1a-4098-80f7-7abdf0313399",
             "secrete": "mABKue3DGqxuNQh6Mj78nUQOOymzDSYF"
         }
     }
 ]
-SURL='http://0.0.0.0:9874'
+
 
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
@@ -44,7 +46,11 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         if self.path.startswith('/bd/consumer'):
             if '?' in self.path:
                 key = self.path.split('=')[1].strip()
-                result = self.decryptConsumerData(YK_data=self.data_string,Key=key)
+                yk_data = self.decryptConsumerData(YK_data=self.data_string,Key=key)
+                result = self.encryptConsumerData(yk_data)
+                #把每次交换的数据记录下来
+                log(str(yk_data)+"\r\n"+str(json.loads(result)))
+
                 self.wfile.write(bytes(result,'utf8'))
         return
 
@@ -74,7 +80,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         print('ge平台解析后的数据：'+str(yk_data))
 
-        return self.encryptConsumerData(yk_data)
+        return yk_data
 
 
     def encryptConsumerData(self,yk_data):
@@ -89,7 +95,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         crypt_yk_data = crypt.encrypt(json_yk_data)
 
-        result = self.sendRequest(SURL+dataexchange[0]['producer']['url']+dataexchange[0]['producer']['key'],crypt_yk_data)
+        result = self.sendRequest(dataexchange[0]['producer']['ip']+dataexchange[0]['producer']['url']+dataexchange[0]['producer']['key'],crypt_yk_data)
 
         return result
 
