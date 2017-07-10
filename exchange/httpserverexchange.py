@@ -78,8 +78,6 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         yk_data =simplejson.loads(real_yk_data)
 
-        print('ge平台解析后的数据：'+str(yk_data))
-
         return yk_data
 
 

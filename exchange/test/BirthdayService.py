@@ -22,10 +22,8 @@ class BirthdayResiveService(object):
         real_yk_data = crypt.decrypt(YK_data)
         yk_data =simplejson.loads(real_yk_data)#list
 
-        print('生日管家收到ge的数据：'+str(yk_data))
         result = BirthdayResiveService.handl_data(self,yk_data)
 
-        print('生日管家匹配后生成的画像数据：'+result)
         return result
 
 
