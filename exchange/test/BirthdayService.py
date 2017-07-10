@@ -1,6 +1,5 @@
 import json
 import random
-import urllib
 
 import simplejson
 from exchange.AESCipher import AESCipher
@@ -12,7 +11,7 @@ BIV="mABKue3DGqxuNQh6Mj78nUQOOymzDSYF"
 
 class BirthdayResiveService(object):
 
-    def decryptYiKaData(self,YK_data,Key):
+    def decryptProducerData(self,YK_data,Key):
         if len(Key) == 0 or len(YK_data)==0:
             return
         crypt = AESCipher(Key[:16],BIV[:16])

@@ -1,10 +1,12 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import os
-import csv
 import json
+import urllib
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
 import simplejson
-#from .AESCipher import AESCipher
-from exchange.test.GE import ImitateGE
+
+from exchange.AESCipher import AESCipher
+
+
 port = 9875
 
 dataexchange = [
@@ -21,6 +23,7 @@ dataexchange = [
         }
     }
 ]
+SURL='http://0.0.0.0:9874'
 
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
@@ -41,15 +44,77 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         if self.path.startswith('/bd/consumer'):
             if '?' in self.path:
                 key = self.path.split('=')[1].strip()
-                result = ImitateGE.decryptYiKaData(self, YK_data=self.data_string, Key=key)
+                result = self.decryptConsumerData(YK_data=self.data_string,Key=key)
                 self.wfile.write(bytes(result,'utf8'))
-
         return
 
 
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
         BaseHTTPRequestHandler.end_headers(self)
+
+
+    def decryptConsumerData(self,YK_data,Key):
+        '''
+        decrypt ConsumerData and handle
+        :param YK_data:
+        :param Key:
+        :return:
+        '''
+
+        if len(Key) == 0 or len(YK_data)==0:
+            return
+
+        crypt = AESCipher(Key[:16],dataexchange[0]['consumer']['secrete'][:16])
+        if(crypt == None):
+            return
+        real_yk_data = crypt.decrypt(YK_data)
+
+        yk_data =simplejson.loads(real_yk_data)
+
+        print('ge平台解析后的数据：'+str(yk_data))
+
+        return self.encryptConsumerData(yk_data)
+
+
+    def encryptConsumerData(self,yk_data):
+        '''
+        encrypt data and send BrithdayManager
+        :param yk_data:
+        :return:
+        '''
+        crypt = AESCipher(dataexchange[0]['producer']['key'][:16], dataexchange[0]['producer']['secrete'][:16])
+
+        json_yk_data=json.dumps(yk_data)
+
+        crypt_yk_data = crypt.encrypt(json_yk_data)
+
+        result = self.sendRequest(SURL+dataexchange[0]['producer']['url']+dataexchange[0]['producer']['key'],crypt_yk_data)
+
+        return result
+
+    def sendRequest(self,url, data):
+        '''
+        send post request
+        :return:
+        '''
+        if (len(url) == 0):
+            return
+
+        req = urllib.request.Request(url, data=data)
+        resp = urllib.request.urlopen(req)
+        print('send successful')
+
+        #接受响应回来的数据
+        result = resp.read()
+        if len(result) !=0 :
+            str_data = str(result,'utf-8')
+            #对响应回来的数据进行截取
+            index = str_data.index('[')
+            data = str_data[index:]
+           #json_data = json.dumps(data)
+        return data
+
 
 def run():
     print('starting server...')
