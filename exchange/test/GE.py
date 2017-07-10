@@ -1,9 +1,10 @@
 import json
 import os
+import urllib
 
 import simplejson
 import time
-from exchange.test import  Utils
+
 
 from exchange.AESCipher import AESCipher
 
@@ -14,6 +15,7 @@ IV = '4mA1y7U3xKhXAwB3D4CRqmS6ie88XQmi'
 #BirthdayManager
 BKEY='cdcd8132-ae1a-4098-80f7-7abdf0313399'
 BIV='mABKue3DGqxuNQh6Mj78nUQOOymzDSYF'
+
 class ImitateGE(object):
     '''
     GE platme transform data
@@ -38,7 +40,7 @@ class ImitateGE(object):
 
         print('ge平台解析后的数据：'+str(yk_data))
 
-        ImitateGE.encryptYiKaData(self,yk_data)
+        return ImitateGE.encryptYiKaData(self,yk_data)
 
 
     def encryptYiKaData(self,yk_data):
@@ -53,44 +55,32 @@ class ImitateGE(object):
 
         crypt_yk_data = crypt.encrypt(json_yk_data)
 
-        Utils.sendRequest('http://0.0.0.0:9874/bd/producer?apikey=%s'%BKEY,crypt_yk_data)
+        result = ImitateGE.sendRequest('http://0.0.0.0:9874/bd/producer?apikey=%s'%BKEY,crypt_yk_data)
+
+        return result
 
 
-    def decryptBirthdayData(self,BM_data,BKey):
+    def sendRequest(url, data):
         '''
-        decrypt BirthdayData and handle
-        :param BM_data:
-        :param BKey:
+        send post request
         :return:
         '''
-        if len(BKey) == 0 or len(BM_data)==0:
+        if (len(url) == 0):
             return
 
-        crypt = AESCipher(BKey[:16],BIV[:16])
-        if(crypt == None):
-            return
-        real_bm_data = crypt.decrypt(BM_data)
+        req = urllib.request.Request(url, data=data)
+        resp = urllib.request.urlopen(req)
+        print('send successful')
 
-        #
-        bm_data =simplejson.loads(real_bm_data)
-
-        ImitateGE.encryptBirthdayData(self,bm_data)
-
-    def encryptBirthdayData(self,bm_data):
-        '''
-        encrypt data and send YIKA
-        :param bm_data:
-        :return:
-        '''
-        crypt = AESCipher(KEY[:16], IV[:16])
-
-        json_bm_data = json.dumps(bm_data)
-
-        crypt_bm_data = crypt.encrypt(json_bm_data)
-
-        print('ge平台接受生日管家解析后的数据'+str(crypt_bm_data,'utf-8'))
-
-        Utils.sendRequest('http://0.0.0.0:9873/bd/consumer?apikey=%s' % BKEY, crypt_bm_data)
+        #接受响应回来的数据
+        result = resp.read()
+        if len(result) !=0 :
+            str_data = str(result,'utf-8')
+            #对响应回来的数据进行截取
+            index = str_data.index('[')
+            data = str_data[index:]
+           #json_data = json.dumps(data)
+        return data
 
 
 

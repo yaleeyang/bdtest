@@ -1,10 +1,11 @@
 
 
 import json
+import urllib
 
 import simplejson
 
-from exchange.test import Utils
+
 
 
 
@@ -21,10 +22,11 @@ class ImitateYiKa(object):
     def imitateData(self):
         '''
         imitate yika product data
+        生成加密后的yika数据，然后把加密后的数据使用postman来进行send
         :return:
         '''
         yk_data = []
-        with open('/Users/sunny/Documents/gooddata0/C2016-12-24.csv','r') as files:
+        with open('./C2016-12-24.csv','r') as files:
             for line in files:
                 json_v = {}
                 phone = str(line.split(',')[2])
@@ -40,15 +42,9 @@ class ImitateYiKa(object):
         encrypt = AESCipher(key,iv)
         encryptData = encrypt.encrypt(json_yk_data)
 
-        Utils.sendRequest('http://0.0.0.0:9875/bd/consumer?apikey=%s'%KEY,encryptData)
+        print(encryptData)
 
-    def hadleBMdata(self,BM_data):
-        aesc = AESCipher(KEY[:16],IV[:16])
-        bm_data = aesc.decrypt(BM_data)
-        data = simplejson.loads(bm_data)
 
-        print('翼 卡收到ge平台传过来的数据'+str(data))
-
-#ImitateYiKa().imitateData()
+ImitateYiKa().imitateData()
 
 

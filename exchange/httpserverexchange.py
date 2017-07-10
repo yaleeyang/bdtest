@@ -41,16 +41,11 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         if self.path.startswith('/bd/consumer'):
             if '?' in self.path:
                 key = self.path.split('=')[1].strip()
-                ImitateGE.decryptYiKaData(self, YK_data=self.data_string, Key=key)
-        elif self.path.startswith('/bd/producer'):
-            if '?' in self.path:
-                key=self.path.split('=')[1]
-                ImitateGE.decryptBirthdayData(self,BM_data=self.data_string,BKey=key)
-
-        # data = simplejson.loads(self.data_string)
-        # print(data['test'])
+                result = ImitateGE.decryptYiKaData(self, YK_data=self.data_string, Key=key)
+                self.wfile.write(bytes(result,'utf8'))
 
         return
+
 
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')

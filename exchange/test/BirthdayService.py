@@ -1,8 +1,10 @@
 import json
 import random
+import urllib
+
 import simplejson
 from exchange.AESCipher import AESCipher
-from exchange.test import Utils
+
 
 BKey="cdcd8132-ae1a-4098-80f7-7abdf0313399"
 BIV="mABKue3DGqxuNQh6Mj78nUQOOymzDSYF"
@@ -25,13 +27,7 @@ class BirthdayResiveService(object):
         result = BirthdayResiveService.handl_data(self,yk_data)
 
         print('生日管家匹配后生成的画像数据：'+result)
-        #hadle result send to GE platform
-        BirthdayResiveService.encryptBMData(self,result)
-
-    def encryptBMData(self,yk_data):
-        crypt = AESCipher(BKey[:16], BIV[:16])
-        crypt_yk_data = crypt.encrypt(yk_data)
-        Utils.sendRequest('http://0.0.0.0:9875/bd/producer?apikey=%s'%BKey,crypt_yk_data)
+        return result
 
 
     def handl_data(self,datas):

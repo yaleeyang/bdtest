@@ -24,7 +24,8 @@ class BirthdayManagerHandler(BaseHTTPRequestHandler):
         if self.path.startswith('/bd/producer'):
             if '?' in path:
                 key = path.split('=')[1]
-                BirthdayResiveService.decryptYiKaData(self,self.data_string,key)
+                result = BirthdayResiveService.decryptYiKaData(self,self.data_string,key)
+                self.wfile.write(bytes(result, "utf8"))
         return
 
     def end_headers(self):
