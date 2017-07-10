@@ -1,7 +1,7 @@
 import os
 import time
 
-path='./'
+path='~/log/'
 suffle='.log'
 def log(line):
     '''
