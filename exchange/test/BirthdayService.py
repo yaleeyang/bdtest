@@ -26,6 +26,16 @@ class BirthdayResiveService(object):
         print('bm处理过后的数据:'+result)
         return result
 
+    def encryptData(self,data):
+        if len(data)==0:
+            return
+        crypt = AESCipher(BKey[:16],BIV[:16])
+        if (crypt == None):
+            return
+        crypt_data = crypt.encrypt(data)
+
+        return crypt_data
+
 
     def handl_data(self,datas):
         jsongeo_v=[]

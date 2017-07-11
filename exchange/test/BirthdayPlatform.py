@@ -25,7 +25,10 @@ class BirthdayManagerHandler(BaseHTTPRequestHandler):
             if '?' in path:
                 key = path.split('=')[1]
                 result = BirthdayResiveService.decryptProducerData(self,self.data_string,key)
-                self.wfile.write(bytes(result, "utf8"))
+
+                #解析后的数据进行加密
+                crypt_result = BirthdayResiveService.encryptData(self,result)
+                self.wfile.write(crypt_result)
         return
 
     def end_headers(self):

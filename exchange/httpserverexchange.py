@@ -53,16 +53,19 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
                     self.wfile.write(bytes(json.dumps(code),'utf8'))
                     return
                 #解密consumer数据
-                yk_data = self.decryptConsumerData(YK_data=self.data_string,Key=key)
+                con_data = self.decryptData(self.data_string,dataexchange[0]['consumer'])
                 #加密发往producer的数据
-                crypt_yk_data = self.encryptProducerData(yk_data)
-                #往producer发送加密数据并且接受响应结果
-                result = self.sendRequest(dataexchange[0]['producer']['ip'] + dataexchange[0]['producer']['url'] +
-                                          dataexchange[0]['producer']['key'], crypt_yk_data)
+                crypt_pro_data = self.encryptData(con_data,dataexchange[0]['producer'])
+                #往producer发送加密数据并且接受响应结果(加密了的数据)
+                resp_result = self.sendRequest(dataexchange[0]['producer'],crypt_pro_data)
+                #数据解密
+                decrypt_data = self.decryptData(resp_result,dataexchange[0]['producer'])
                 #把每次交换的数据记录下来
-                log(str(yk_data)+"\r\n"+str(json.loads(result)))
+                log(str(con_data)+"\r\n"+str(decrypt_data))
 
-                self.wfile.write(bytes(result,'utf8'))
+                #数据加密并且发送
+                crypt_data = self.encryptData(decrypt_data,dataexchange[0]['consumer'])
+                self.wfile.write(crypt_data)
         return
 
 
@@ -71,50 +74,54 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         BaseHTTPRequestHandler.end_headers(self)
 
 
-    def decryptConsumerData(self,YK_data,Key):
+    def decryptData(self,com_data,obj):
         '''
         decrypt ConsumerData and handle
         :param YK_data:
         :param Key:
-        :return:
+        :return:type is list
         '''
-
-        if len(Key) == 0 or len(YK_data)==0:
+        if len(obj['key']) == 0 or len(com_data)==0:
             return
 
-        crypt = AESCipher(Key[:16],dataexchange[0]['consumer']['secrete'][:16])
+        crypt = AESCipher(obj['key'][:16],obj['secrete'][:16])
         if(crypt == None):
             return
-        real_yk_data = crypt.decrypt(YK_data)
+        real_com_data = crypt.decrypt(com_data)
 
-        yk_data =simplejson.loads(real_yk_data)
+        data =simplejson.loads(real_com_data)
 
-        return yk_data
+        return data
 
 
-    def encryptProducerData(self,yk_data):
+    def encryptData(self,pro_data,obj):
         '''
         encrypt data and send BrithdayManager
         :param yk_data:
-        :return:
+        :return:type is bytes
         '''
-        crypt = AESCipher(dataexchange[0]['producer']['key'][:16], dataexchange[0]['producer']['secrete'][:16])
+        crypt = AESCipher(obj['key'][:16], obj['secrete'][:16])
+        if (crypt == None):
+            return
+        json_pro_data=json.dumps(pro_data)
 
-        json_yk_data=json.dumps(yk_data)
+        crypt_pro_data = crypt.encrypt(json_pro_data)
 
-        crypt_yk_data = crypt.encrypt(json_yk_data)
+        return crypt_pro_data
 
-        return crypt_yk_data
-
-    def sendRequest(self,url, data):
+    def sendRequest(self,obj,data):
         '''
         send post request
-        :return:
+        :param obj:
+        :param data:
+        :return:type is str
         '''
+        url=obj['ip']+obj['url']+obj['key']
+
         if (len(url) == 0):
             return
 
-        req = urllib.request.Request(url, data=data)
+        req = urllib.request.Request(url,data)
         resp = urllib.request.urlopen(req)
 
         #接受响应回来的数据
@@ -122,10 +129,11 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         if len(result) !=0 :
             str_data = str(result,'utf-8')
             #对响应回来的数据进行截取
-            index = str_data.index('[')
-            data = str_data[index:]
-           #json_data = json.dumps(data)
-        return data
+            if '*' in str_data:
+                index = str_data.index('*')+1
+                resp_data = str_data[index:].strip('\r\n')
+                #json_data = json.dumps(data)
+        return resp_data
 
 
 def run():
