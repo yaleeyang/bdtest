@@ -30,6 +30,7 @@ class ImitateYiKa(object):
         iv=IV[:16]
         encrypt = AESCipher(key,iv)
         encryptData = encrypt.encrypt(json_yk_data)
+        print(encryptData)
 ImitateYiKa().imitateData()
 
 

@@ -21,9 +21,9 @@ class BirthdayResiveService(object):
         #encrypt  GE transmit data
         real_yk_data = crypt.decrypt(YK_data)
         yk_data =simplejson.loads(real_yk_data)#list
-
+        print('bm接受ge发送过来的解密数据：'+str(yk_data))
         result = BirthdayResiveService.handl_data(self,yk_data)
-
+        print('bm处理过后的数据:'+result)
         return result
 
 

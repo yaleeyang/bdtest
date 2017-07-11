@@ -5,7 +5,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import simplejson
 
 from exchange.AESCipher import AESCipher
-from exchange.test.Logger import log
+from exchange.Logger import log
 
 port = 9875
 
@@ -44,10 +44,21 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         if self.path.startswith('/bd/consumer'):
+            code={}
             if '?' in self.path:
                 key = self.path.split('=')[1].strip()
+                if not key==dataexchange[0]['consumer']['key']:
+                    code['code']='{}'.format('faile')
+                    code['error'] = '{}'.format('apikey error')
+                    self.wfile.write(bytes(json.dumps(code),'utf8'))
+                    return
+                #解密consumer数据
                 yk_data = self.decryptConsumerData(YK_data=self.data_string,Key=key)
-                result = self.encryptConsumerData(yk_data)
+                #加密发往producer的数据
+                crypt_yk_data = self.encryptProducerData(yk_data)
+                #往producer发送加密数据并且接受响应结果
+                result = self.sendRequest(dataexchange[0]['producer']['ip'] + dataexchange[0]['producer']['url'] +
+                                          dataexchange[0]['producer']['key'], crypt_yk_data)
                 #把每次交换的数据记录下来
                 log(str(yk_data)+"\r\n"+str(json.loads(result)))
 
@@ -81,7 +92,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         return yk_data
 
 
-    def encryptConsumerData(self,yk_data):
+    def encryptProducerData(self,yk_data):
         '''
         encrypt data and send BrithdayManager
         :param yk_data:
@@ -93,9 +104,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         crypt_yk_data = crypt.encrypt(json_yk_data)
 
-        result = self.sendRequest(dataexchange[0]['producer']['ip']+dataexchange[0]['producer']['url']+dataexchange[0]['producer']['key'],crypt_yk_data)
-
-        return result
+        return crypt_yk_data
 
     def sendRequest(self,url, data):
         '''
@@ -107,7 +116,6 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         req = urllib.request.Request(url, data=data)
         resp = urllib.request.urlopen(req)
-        print('send successful')
 
         #接受响应回来的数据
         result = resp.read()

@@ -11,6 +11,11 @@ def log(line):
     '''
     #以每天的日期对该log文件进行命名
     filename = time.strftime('%Y-%m-%d',time.localtime())+suffle
+    file=None
+    #判断目录是否存在
+    if not os.path.exists(path):
+        os.mkdir(path)
+
     #判断该文件是否存在
     if not os.path.exists(path+filename):
         os.system('touch '+path+filename)
