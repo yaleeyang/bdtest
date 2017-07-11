@@ -8,10 +8,13 @@ expiretime = 157680000 #5 years in seconds
 r = redis.StrictRedis(host=host)
 
 files = os.listdir(path)
+fileslen = len(files)
+inprocess = 0
 for file in files:
+    inprocess += 1
     index = 1
     with open(path + file) as f:
-        print("set file:" + file)
+        print("set file:" + file + " " + str(inprocess) + "/" + str(fileslen))
         pipeline = r.pipeline()
         for line in f:
             parts = line.split(',')
