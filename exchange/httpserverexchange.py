@@ -26,7 +26,6 @@ dataexchange = [
     }
 ]
 
-
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
@@ -72,7 +71,6 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
         BaseHTTPRequestHandler.end_headers(self)
-
 
     def decryptData(self,com_data,obj):
         '''
