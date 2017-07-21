@@ -16,7 +16,7 @@ class AESCipher:
 
     def encrypt( self, raw ):
         aes = AES.new(self.key, MODE, self.iv, segment_size=SEGMENT_SIZE)
-        plaintext = self._pad_string(raw)
+        plaintext = self.pick_pad_string(raw)
         encrypted_text = aes.encrypt(plaintext)
         return base64.b64encode(encrypted_text)
 
@@ -24,11 +24,23 @@ class AESCipher:
         aes = AES.new(self.key, MODE, self.iv, segment_size=SEGMENT_SIZE)
         encrypted_text_bytes = base64.b64decode(enc)
         decrypted_text = aes.decrypt(encrypted_text_bytes)
-        decrypted_text = self._unpad_string(decrypted_text)
+        decrypted_text = self.pick_unpad_string(decrypted_text)
         return decrypted_text
 
-    def _pad_string(self, value):
+    #pick5 padding
+    def pick_pad_string(self, value):
         return pdd(value)
 
-    def _unpad_string(self, value):
+    #pick5 unpadding
+    def pick_unpad_string(self, value):
         return unpdd(value)
+
+    def _pad_string(self,value):
+        length = len(value)
+        pad_size = BLOCK_SIZE - (length % BLOCK_SIZE)
+        return value.ljust(length + pad_size, '\x00')
+
+    def _unpad_string(self, value):
+        while value[-1] == 0:
+            value = value[:-1]
+        return value

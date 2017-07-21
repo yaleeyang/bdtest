@@ -47,10 +47,10 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         val = self.headers['Content-Length']
         self.send_response(200)
         self.end_headers()
-        decrypt_data = 'null'
+        #no match data logging  null
+        real_data = 'null'
         con_data = 'null'
         if self.path.startswith('/bd/consumer'):
-
             if '?' in self.path:
                 key = self.path.split('=')[1].strip()
                 if not key==dataexchange[0]['consumer']['key']:
@@ -76,10 +76,14 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
                     crypt_data = self.encryptData(decrypt_data, dataexchange[0]['consumer'])
                     crypt_jd = self.joinData(crypt_data)
                     self.wfile.write(crypt_jd)
-                #解析数据and把每次交换的数据记录下来
-                real_data = decrypt_data.encode('unicode_escape')
-
-                log(str(con_data)+"\r\n"+str(real_data,'utf-8'))
+                    #解析数据and把每次交换的数据记录下来
+                    real_data = bytes(decrypt_data,'utf-8').decode('unicode_escape')
+                else :
+                    msg = self.errorMsg('not match infomation！',phone=con_data)
+                    self.wfile.write(bytes(json.dumps(msg), 'utf8'))
+                log(str(con_data)+"\r\n"+real_data)
+        else:
+            self.wfile.write(bytes(json.dumps(self.errorMsg('vistis url error！')), 'utf8'))
         return
 
 
@@ -104,11 +108,13 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
         if(len(data)==0):
             return None
+        try:
+            real_com_data = crypt.decrypt(data)
 
-        real_com_data = crypt.decrypt(data)
+            return str(real_com_data, 'utf-8')
 
-        return str(real_com_data,'utf-8')
-
+        except BaseException:
+            return None
 
     def encryptData(self,pro_data,obj):
         '''
@@ -149,7 +155,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         if result==None:
             return None
         if len(result) !=0 :
-            str_data = str(result,'utf-8').strip()
+            str_data = str(result,'utf-8')
             real_data = json.loads(str_data)
             code = real_data.get('code', 'ok')
             #没有匹配到数据，返回None
@@ -168,14 +174,18 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         }
         return bytes(json.dumps(json_data),"utf8")
 
-    def errorMsg(self,msg):
+    def errorMsg(self,msg,phone=None):
         '''
         :param msg: error msg ;type is str
         :return: type is dict
         '''
         code = {}
-        code['code'] = '{}'.format('faile')
+        code['code'] = '{}'.format('fail')
         code['error'] = '{}'.format(msg)
+        if not phone == None:
+            #把｛'phone'：'12312312'｝放入到code中
+            p = json.loads(phone)
+            code.update(p)
         return code
 
 def run():
