@@ -1,7 +1,7 @@
 import os
 import time
 
-path='~/log/'
+path='./log/'
 suffle='.log'
 def log(line):
     '''
@@ -23,8 +23,7 @@ def log(line):
     try:
         #以追加和读的模式打开文件
         file = open(path+filename,'a+')
-        file.write(line)
-        file.newlines
+        file.write(line+'\r\n')
     except IOError as e:
         print('file execute error:'+e)
     finally:

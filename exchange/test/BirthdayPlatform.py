@@ -24,6 +24,7 @@ class BirthdayManagerHandler(BaseHTTPRequestHandler):
         if self.path.startswith('/bd/producer'):
             if '?' in path:
                 key = path.split('=')[1]
+                print(self.data_string)
                 result = BirthdayResiveService.decryptProducerData(self,self.data_string,key)
 
                 #解析后的数据进行加密

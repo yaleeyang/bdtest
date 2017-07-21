@@ -6,7 +6,8 @@ MODE = AES.MODE_CBC
 BLOCK_SIZE = 16
 SEGMENT_SIZE = 128
 
-
+pdd = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * chr(BLOCK_SIZE - len(s) % BLOCK_SIZE)
+unpdd = lambda s : s[0:-(s[-1])]
 class AESCipher:
 
     def __init__( self, key, iv ):
@@ -27,11 +28,7 @@ class AESCipher:
         return decrypted_text
 
     def _pad_string(self, value):
-        length = len(value)
-        pad_size = BLOCK_SIZE - (length % BLOCK_SIZE)
-        return value.ljust(length + pad_size, '\x00')
+        return pdd(value)
 
     def _unpad_string(self, value):
-        while value[-1] == 0:
-            value = value[:-1]
-        return value
+        return unpdd(value)
