@@ -102,11 +102,13 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         crypt = AESCipher(obj['secrete'][:16],obj['key'][:16])
         if(crypt == None):
             return
-        data =simplejson.loads(com_data).get('data',None)
 
-        if data==None or (len(data)==0):
-            return None
         try:
+            data =simplejson.loads(com_data).get('data',None)
+
+            if data==None or (len(data)==0):
+                return None
+
             real_com_data = crypt.decrypt(data)
 
             return str(real_com_data, 'utf-8')
