@@ -27,11 +27,11 @@ class AESCipher:
         decrypted_text = self.pick_unpad_string(decrypted_text)
         return decrypted_text
 
-    #pick5 padding
+    #pkcs5 padding
     def pick_pad_string(self, value):
         return pdd(value)
 
-    #pick5 unpadding
+    #pkcs5 unpadding
     def pick_unpad_string(self, value):
         return unpdd(value)
 

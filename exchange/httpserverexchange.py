@@ -102,9 +102,9 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         crypt = AESCipher(obj['secrete'][:16],obj['key'][:16])
         if(crypt == None):
             return
-        data =simplejson.loads(com_data)['data']
+        data =simplejson.loads(com_data).get('data',None)
 
-        if(len(data)==0):
+        if data==None or (len(data)==0):
             return None
         try:
             real_com_data = crypt.decrypt(data)
@@ -191,7 +191,6 @@ def run():
 
     # Server settings
     # Choose port 8080, for port 80, which is normally used for a http server, you need root access
-    #server_address = ('0.0.0.0', port)
     server_address = ('0.0.0.0', port)
     httpd = HTTPServer(server_address, testHTTPServer_RequestHandler)
     print('running server...{}'.format(port))
