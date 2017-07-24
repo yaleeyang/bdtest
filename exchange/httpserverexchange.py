@@ -1,13 +1,12 @@
 import json
 import urllib.request
 from http.server import BaseHTTPRequestHandler, HTTPServer
-
 import simplejson
 
 from exchange.AESCipher import AESCipher
 from exchange.Logger import log
 
-port = 9875
+port = 9877
 
 dataexchange = [
     {
@@ -20,7 +19,6 @@ dataexchange = [
         },
         #生日管家
         "producer": {
-            #"ip":"http://0.0.0.0:9874",
             "ip":"https://extapi.octinn.com",
             "url": "/nameService/phone?apikey=",
             "key": "cdcd8132-ae1a-4098-80f7-7abdf0313399",#iv
@@ -193,6 +191,7 @@ def run():
 
     # Server settings
     # Choose port 8080, for port 80, which is normally used for a http server, you need root access
+    #server_address = ('0.0.0.0', port)
     server_address = ('0.0.0.0', port)
     httpd = HTTPServer(server_address, testHTTPServer_RequestHandler)
     print('running server...{}'.format(port))
