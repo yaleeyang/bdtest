@@ -1,13 +1,12 @@
 import json
 import urllib.request
 from http.server import BaseHTTPRequestHandler, HTTPServer
-
 import simplejson
 
 from exchange.AESCipher import AESCipher
 from exchange.Logger import log
 
-port = 9875
+port = 9877
 
 dataexchange = [
     {
@@ -20,7 +19,6 @@ dataexchange = [
         },
         #生日管家
         "producer": {
-            #"ip":"http://0.0.0.0:9874",
             "ip":"https://extapi.octinn.com",
             "url": "/nameService/phone?apikey=",
             "key": "cdcd8132-ae1a-4098-80f7-7abdf0313399",#iv
@@ -104,11 +102,13 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         crypt = AESCipher(obj['secrete'][:16],obj['key'][:16])
         if(crypt == None):
             return
-        data =simplejson.loads(com_data)['data']
 
-        if(len(data)==0):
-            return None
         try:
+            data =simplejson.loads(com_data).get('data',None)
+
+            if data==None or (len(data)==0):
+                return None
+
             real_com_data = crypt.decrypt(data)
 
             return str(real_com_data, 'utf-8')
