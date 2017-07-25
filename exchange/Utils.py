@@ -31,21 +31,6 @@ def log(line):
         if not file==None:
             file.close()
 
-def readConfig(filename=None):
-    '''
-    :param filename:file addr
-    :return: ConfigParser
-    '''
-    if filename ==None:
-        return
-
-    cp = ConfigParser()
-
-    #load file
-    cp.read(filename)
-
-    return cp
-
 class ReadConfig(object):
     def __init__(self,filename=None):
         if filename is None or len(filename.strip()) == 0:
