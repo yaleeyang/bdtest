@@ -4,25 +4,31 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import simplejson
 
 from exchange.AESCipher import AESCipher
-from exchange.Logger import log
+from exchange.Utils import log
+from exchange.Utils import ReadConfig
+
 
 port = 9877
 
+#load config
+rc = ReadConfig('./ge.conf')
+consumer = rc.getItems('consumer')
+producer = rc.getItems('producer')
 dataexchange = [
     {
         #翼 卡
         "consumer": {
-            "ip":"",
-            "url": "/bd/consumer?apikey=",
-            "key": "f12793c2-7f0f-49d8-8151-0129596ae91b",#iv
-            "secrete": "4mA1y7U3xKhXAwB3D4CRqmS6ie88XQmi"#privatekey
+            "ip":consumer['ip'],
+            "url": consumer['url'],
+            "key": consumer['key'],#iv
+            "secrete": consumer['secrete']#privatekey
         },
         #生日管家
         "producer": {
-            "ip":"https://extapi.octinn.com",
-            "url": "/nameService/phone?apikey=",
-            "key": "cdcd8132-ae1a-4098-80f7-7abdf0313399",#iv
-            "secrete": "mABKue3DGqxuNQh6Mj78nUQOOymzDSYF" #privatekey
+            "ip":producer['ip'],
+            "url": producer['url'],
+            "key": producer['key'],#iv
+            "secrete": producer['secrete'] #privatekey
         }
     }
 ]
@@ -34,7 +40,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
     def _set_headers(self):
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
-        self.end_headers()
+        BaseHTTPRequestHandler.end_headers(self)
 
     # GET
     def do_POST(self):
@@ -44,7 +50,6 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         self.data_string = self.rfile.read(int(self.headers['Content-Length']))
         val = self.headers['Content-Length']
         self.send_response(200)
-        self.end_headers()
         #no match data logging  null
         real_data = 'null'
         con_data = 'null'
@@ -85,9 +90,9 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         return
 
 
-    def end_headers(self):
-        self.send_header('Access-Control-Allow-Origin', '*')
-        BaseHTTPRequestHandler.end_headers(self)
+    # def end_headers(self):
+    #     self.send_header('Access-Control-Allow-Origin', '*')
+    #     BaseHTTPRequestHandler.end_headers(self)
 
     def decryptData(self,com_data,obj):
         '''
@@ -197,6 +202,5 @@ def run():
     httpd = HTTPServer(server_address, testHTTPServer_RequestHandler)
     print('running server...{}'.format(port))
     httpd.serve_forever()
-
 
 run()

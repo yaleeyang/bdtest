@@ -1,12 +1,16 @@
 import json
 
 from exchange.AESCipher import AESCipher
-
-IV ='f12793c2-7f0f-49d8-8151-0129596ae91b'
-KEY = '4mA1y7U3xKhXAwB3D4CRqmS6ie88XQmi'
+from exchange.Utils import ReadConfig
 
 
 
+rc = ReadConfig('../ge.conf')
+consumer = rc.getItems('consumer')
+producer = rc.getItems('producer')
+
+IV =consumer['key']
+KEY = consumer['secrete']
 class ImitateYiKa(object):
 
     def imitateData(self):
@@ -58,8 +62,8 @@ class ImitateYiKa(object):
         print(encryptData)
 
     def Test(self):
-        key = 'mABKue3DGqxuNQh6Mj78nUQOOymzDSYF'[:16]
-        iv = 'cdcd8132-ae1a-4098-80f7-7abdf0313399'[:16]
+        key = producer['secrete'][:16]
+        iv = producer['key'][:16]
         print(key)
         print(iv)
         test = [{

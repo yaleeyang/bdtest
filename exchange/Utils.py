@@ -1,5 +1,6 @@
 import os
 import time
+from configparser import ConfigParser
 
 path='./log/'
 suffle='.log'
@@ -29,3 +30,30 @@ def log(line):
     finally:
         if not file==None:
             file.close()
+
+class ReadConfig(object):
+    def __init__(self,filename=None):
+        if filename is None or len(filename.strip()) == 0:
+            return
+        self.filename = filename
+
+    def getItems(self,section):
+        '''
+        :param section:type is str
+        :return: dict_items type is dict
+        '''
+
+        if not isinstance(section,str) and len(section.strip()) == 0:
+            return
+
+        cp = ConfigParser()
+        # load file
+        cp.read(self.filename)
+
+        sections = cp.items(section.strip())
+
+        dict_items={}
+        for st in sections:
+            dict_items[st[0]]=st[1]
+
+        return dict_items

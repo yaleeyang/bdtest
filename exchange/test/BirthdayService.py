@@ -5,8 +5,8 @@ import simplejson
 from exchange.AESCipher import AESCipher
 
 
-BKey="cdcd8132-ae1a-4098-80f7-7abdf0313399"
-BIV="mABKue3DGqxuNQh6Mj78nUQOOymzDSYF"
+BKey="xxxxxxxxxxxxxxxxx"
+BIV="xxxxxxxxxxxxxxxxxx"
 
 
 class BirthdayResiveService(object):
