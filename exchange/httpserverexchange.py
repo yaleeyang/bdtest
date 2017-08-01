@@ -40,7 +40,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
     def _set_headers(self):
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
-        self.end_headers()
+        BaseHTTPRequestHandler.end_headers(self)
 
     # GET
     def do_POST(self):
@@ -50,7 +50,6 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         self.data_string = self.rfile.read(int(self.headers['Content-Length']))
         val = self.headers['Content-Length']
         self.send_response(200)
-        self.end_headers()
         #no match data logging  null
         real_data = 'null'
         con_data = 'null'
@@ -91,9 +90,9 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         return
 
 
-    def end_headers(self):
-        self.send_header('Access-Control-Allow-Origin', '*')
-        BaseHTTPRequestHandler.end_headers(self)
+    # def end_headers(self):
+    #     self.send_header('Access-Control-Allow-Origin', '*')
+    #     BaseHTTPRequestHandler.end_headers(self)
 
     def decryptData(self,com_data,obj):
         '''
