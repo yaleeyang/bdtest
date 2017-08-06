@@ -40,7 +40,8 @@ def sendRequest(lng,lat):
         'ak':ak
     }
     url_args = parse.urlencode(args)
-    resp = request.urlopen(url+url_args)
+    req = request.Request(url+url_args)
+    resp = request.urlopen(req)
     result = resp.read().decode('utf-8')
     #把返回的结果转换为dict
     json_result = json.loads(result)
@@ -72,5 +73,5 @@ def getLngLat():
             addr = addr_info['result']['pois'][0].get('name','Null')
             save.write(line+','+addr+'\n')
     save.close()
-getLngLat()
+
 #insert overwrite local directory '/opt/sunny/hive-export/original/' row format delimited fields  terminated by ',' select * from sunny.trajectory_cloud;

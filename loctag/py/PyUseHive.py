@@ -1,6 +1,6 @@
 import os
 import sys
-
+import loctag.py.getXQ as getXQ
 import time
 
 '''
@@ -21,34 +21,33 @@ else:
     hql = sys.argv[3]   #hql
 
     code = os.system('yarn jar /opt/sunny/Jars/geo.jar com.tuqu.sunny.mr.ClearTrajectoryData %s  %s'%(entry,data))
-
+    print('run yarn Time taken: %s seconds'%(time.time()-startTime))
     #上面命令执行成功
     if code ==0:
-
         if not data.startswith(hdfspath):
             data = hdfspath+data
 
         #指定mapreduce清洗后数据保存的位置
         #指定hql文件所在的位置(default:/opt/sunny/hql/exec.hql)
+        hso_time = time.time()
         cmd ='hive -hiveconf DATA_PATH=%s -f %s'%(data,hql)
-
         Hcode = os.system(cmd)
+        print('run frist hive script Time taken: %s seconds'%(time.time()-hso_time))
 
         if Hcode==0:
-            Pcode = os.system('python /opt/sunny/py/getXQ.py')
-            if Pcode == 0:
-                code = os.system('hive -f /opt/sunny/hql/xq.hql')
-                if code ==0:
-                    print(' success!')
-                else :
-                    print('xq.hql fail!')
-                    sys.exit(1)
+            ptime = time.time()
+            getXQ.getLngLat()
+            print('run python script Time taken: %s seconds'%(time.time()-ptime))
+
+            hst_time =time.time()
+            code = os.system('hive -f /opt/sunny/hql/xq.hql')
+            print('run second hive script Time taken: %s seconds'%(time.time()-hst_time))
+            if code ==0:
+                print('xq.hql success!')
             else :
-                print('getXQ.hql fail!')
-                sys.exit(1)
+                print('xq.hql fail!')
         else:
             print(hql+' fail!')
-            sys.exit(1)
 
 endTme = time.time()#结束时间
 print('Time taken: %s seconds' %(endTme-startTime))
