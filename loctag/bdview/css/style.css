@@ -1,0 +1,54 @@
+@charset='utf-8';
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, dd, dl, dt, li, ol, ul, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+    outline: 0px;
+}
+.container{
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.container .con-left{
+    width: 25%;
+    overflow: hidden;
+    float: left;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.container #containermap{
+    width: 73%;
+    min-width: 50%;
+    float:left;
+}
+
+.container .con-left ul li{
+list-style: none;
+height: 17%;
+width: 100%;
+
+color: #44d3e4;
+border-top: 1px #ccc solid;
+background: rgba(0, 0, 0, 0.1);
+}
+
+.container .con-left #cinfos #cloud_field .field{
+float: left;
+width: 20%;
+text-align: center;
+color: #44d3e4;
+background: #555;
+}
+
+.container .con-left #cinfos #cloud_info .info{
+float: left;
+width: 20%;
+height: 6%;
+text-align: center;
+font-size: 14px;
+color: #44d3e4;
+background: rgba(0, 0, 0, 0.1);
+}
