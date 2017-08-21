@@ -1,8 +1,8 @@
 import json
 import os
-import utils.CommonUtil as utils
+import loctag.py.CommonUtil as utils
 import math
-import utils.CommonUtil as util
+import loctag.py.CommonUtil as util
 
 plng=0
 plat=0

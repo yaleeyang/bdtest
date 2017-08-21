@@ -1,5 +1,6 @@
 
 import math
+from configparser import ConfigParser
 
 x_pi = 3.14159265358979324 * 3000.0 / 180.0
 pi = 3.1415926535897932384626  # π
@@ -81,6 +82,15 @@ def gcj02_to_wgs84(lng, lat):
     mglng = lng + dlng
     return [lng * 2 - mglng, lat * 2 - mglat]
 
+def bd09_to_wgs84(bd_lon, bd_lat):
+    lon, lat = bd09_to_gcj02(bd_lon, bd_lat)
+    return gcj02_to_wgs84(lon, lat)
+
+
+def wgs84_to_bd09(lon, lat):
+    lon, lat = wgs84_to_gcj02(lon, lat)
+    return gcj02_to_bd09(lon, lat)
+
 def _transformlat(lng, lat):
     ret = -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + \
           0.1 * lng * lat + 0.2 * math.sqrt(math.fabs(lng))
@@ -113,3 +123,34 @@ def out_of_china(lng, lat):
     :return:
     """
     return not (lng > 73.66 and lng < 135.05 and lat > 3.86 and lat < 53.55)
+
+
+class ReadConfig(object):
+    '''
+    读取配置文件,filename为文件路径
+    '''
+    def __init__(self,filename=None):
+        if filename is None or len(filename.strip()) == 0:
+            filename='./config.conf'
+
+        self.filename = filename
+
+    def getItems(self,section):
+        '''
+        :param section:type is str
+        :return: dict_items type is dict
+        '''
+        if not isinstance(section,str) and len(section.strip()) == 0:
+            return
+
+        cp = ConfigParser()
+        # load file
+        cp.read(self.filename)
+
+        sections = cp.items(section.strip())
+
+        dict_items={}
+        for st in sections:
+            dict_items[st[0]]=st[1]
+
+        return dict_items

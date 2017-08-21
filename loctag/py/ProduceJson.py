@@ -1,5 +1,5 @@
 import json
-import utils.CommonUtil as util
+import loctag.py.CommonUtil as util
 
 
 rc = util.ReadConfig('../config.conf')

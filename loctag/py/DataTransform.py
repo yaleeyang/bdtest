@@ -1,5 +1,5 @@
 
-import utils.CommonUtil as util
+import loctag.py.CommonUtil as util
 '''
 主要把hive处理后的数据格式WGS84-》任何经纬度格式（）
 '''
@@ -40,9 +40,10 @@ class adapter(object):
         self.obj = obj
         self.__dict__.update(adapted_methods)
 
-def run():
-    lng = 121.493995
-    lat = 31.277239
-    g = gcj02(lng,lat)
-    obj = adapter(g,dict(execute=g.transform))
-    print(obj.execute())
+#Test
+# def run():
+#     lng = 121.493995
+#     lat = 31.277239
+#     g = gcj02(lng,lat)
+#     obj = adapter(g,dict(execute=g.transform))
+#     print(obj.execute())
