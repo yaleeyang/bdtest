@@ -9,7 +9,7 @@ spath = pj['save_path']
 
 geo =[]
 '''
-把文件中的 行数据，转换成前端所能够识别的json格式数据
+把文件中的行数据，转换成前端所能够识别的json格式数据
 '''
 with open(path,'r') as f:
     lines = f.readlines()
@@ -44,6 +44,7 @@ with open(path,'r') as f:
                list_geo.append(float(ll[1]))
                pgs.append(list_geo)
         json_data['polygon'] = '{}'.format(pgs)
+        json_data['weight'] = '{}'.format(float(fields[17].strip('\n')))
         geo.append(json_data)
 
 with open(spath,'w') as w:
