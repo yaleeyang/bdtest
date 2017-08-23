@@ -1,8 +1,7 @@
 import json
 import os
 import loctag.py.CommonUtil as utils
-import math
-import loctag.py.CommonUtil as util
+
 
 plng=0
 plat=0
@@ -11,7 +10,7 @@ geo = []
 '''
 把数据拆成Echarts的Map所能识别 的数据格式
 '''
-rc = util.ReadConfig('../config.conf')
+rc = utils.ReadConfig('../config.conf')
 pp = rc.getItems('ParsePath')
 
 path = pp['src']
@@ -19,8 +18,6 @@ save_path = pp['save_path']
 
 list_file = os.listdir(path)
 ldate = None
-#默认3轨迹为一文件
-default_num=3
 
 def saveFile(save_path,geo):
     o = open(save_path, 'w')
@@ -68,17 +65,7 @@ for fn in list_file:
         if len(val) > 5:
             geo.append(val)
 
-        #取得文件的个数
-        file_num = math.ceil(len(geo) / default_num)
-        for i in range(file_num) :
-            #根据文件个数和默认的轨迹数确定每个文件的轨迹数
-            data = geo[i*default_num:(i+1)*default_num]
-            saveFile(save_path+'trajectory%s.json'%i,data)
-
-        info={}
-        #文件个数反馈给前端页面
-        info['file_num'] = '{}'.format(file_num)
-        saveFile(save_path+'tinfo.json', info)
+        saveFile(save_path + '21-25.json2', geo)
 
 
 
