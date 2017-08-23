@@ -1,0 +1,396 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <title>可视化</title>
+</head>
+<body style="overflow:-Scroll;overflow-y:hidden" >
+    <div class="container">
+        <div class="con-left">
+            <div id="age" style="width: 100%;height:30%;"></div> 
+            <div id="sex" style="width: 100%;height:30%;"></div>
+            <div id="profession" style="width: 100%;height:38%;"></div>
+        </div>
+        
+            <div id="containermap" style="height: 100%"></div>
+        
+    </div>
+</body>
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=CC82b6daa32790ced0d3dff530fbac33"></script>
+<script type="text/javascript" src="./js/echarts.js"></script>
+<script src='./js/echarts-wordcloud.js'></script>
+<script type="text/javascript" src="./js/bmap.min.js"></script>
+<script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('age'));
+
+        // 指定图表的配置项和数据
+        
+        option = {
+            title : {
+                text: '车主年龄分布',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            series : [
+                {
+                    name: '车主年龄分布',
+                    type: 'pie',
+                    radius : '59%',
+                    center: ['50%', '50%'],
+                    animation: true,
+                    data:[
+                        {value:14, name:'25岁以下'},
+                        {value:23, name:'26至30岁'},
+                        {value:17, name:'31至35岁'},
+                        {value:15, name:'36至40岁'},
+                        {value:13, name:'41至45岁'},
+                        {value:18, name:'45岁以上'}
+                    ],
+                    itemStyle: {
+                         normal:{
+                          label:{
+                            show: true,
+                            textStyle:{fontSize:16},
+                            formatter: '{b}\n({d}%)'
+                          },
+                          labelLine :{show:true}
+                        },
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+</script>
+<script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('sex'));
+
+        // 指定图表的配置项和数据
+        
+        option = {
+            title : {
+                text: '车主性别分布',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            series : [
+                {
+                    name: '车主性别分布',
+                    type: 'pie',
+                    radius : '59%',
+                    center: ['50%', '50%'],
+                    animation: true,
+                    data:[
+                        {value:72, name:'男'},
+                        {value:28, name:'女'}
+                    ],
+                    itemStyle: {
+                        normal:{
+                          label:{
+                            show: true,
+                            textStyle:{fontSize:16},
+                            formatter: '{b} : ({d}%)'
+                          },
+                          labelLine :{show:true}
+                        },                
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+</script>
+
+<script type="text/javascript">
+        
+
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('profession'));
+
+        // 指定图表的配置项和数据
+        
+        option = {
+            title : {
+                text: '车主职业分布',
+                x:'center'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            grid: {
+                left: '0%',
+                right: '3%',
+                bottom: '2%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                boundaryGap: [0, 0.25]
+            },
+            yAxis: {
+                type: 'category',
+                data : ['普通职员', '专业技术人员', '事业单位职员', '企业管理者', '公务员', '自由职业者', "其他","私营业主", "家庭主妇","学生"],
+            },
+            series: [
+                {
+                    name: '职业',
+                    type: 'bar',
+                    itemStyle: {
+                         normal: {
+                             label: {
+                                 show: true,
+                                 textStyle: {
+                                     color: '#000000',
+                                     fontWeight: 'bold',
+                                     fontSize: 16
+                                 }
+                             }
+                         }
+                     },            
+                    data: [35, 16, 15, 13, 9, 7, 2, 2, 1, 1]
+                }
+            ]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+</script>
+
+<script type="text/javascript">
+          var dom = document.getElementById("containermap");
+          var myChart = echarts.init(dom);
+          var app = {};
+          option = null;
+          app.title = 'echarts map test';
+// http://localhost:8000/lines-bus.json
+          $.get('http://localhost:8000/line.json', function(data) {
+            console.log(data)
+              var hStep = 300/ (data.length - 1);
+              
+              var busLines = [].concat.apply([], data.map(function (busLine, idx) {
+                  var prevPt;
+                  var points = [];
+                  for (var i = 0; i < busLine.length; i += 2) {
+                      var pt = [busLine[i], busLine[i + 1]];
+                      if (i > 0) {
+                          pt = [
+                              prevPt[0] + pt[0],
+                              prevPt[1] + pt[1]
+                          ];
+                      }
+                      prevPt = pt;
+
+                      points.push([pt[0] / 1e4, pt[1] / 1e4]);
+                  }
+                  return {
+                      coords: points,
+                      lineStyle: {
+                          normal: {
+                              color: echarts.color.modifyHSL('#5A94DF', Math.round(hStep * idx))
+                          }
+                      }
+                  };
+              }));
+
+              myChart.setOption(option = {
+                  bmap: {
+                      center: [121.38,31.13],
+                      //center:[116.46, 39.92],
+                      zoom: 11,
+                      roam: true,
+                      mapStyle: {
+                        'styleJson': [
+                          {
+                            'featureType': 'water',
+                            'elementType': 'all',
+                            'stylers': {
+                              'color': '#031628'
+                            }
+                          },
+                          {
+                            'featureType': 'land',
+                            'elementType': 'geometry',
+                            'stylers': {
+                              'color': '#000102'
+                            }
+                          },
+                          {
+                            'featureType': 'highway',
+                            'elementType': 'all',
+                            'stylers': {
+                              'visibility': 'off'
+                            }
+                          },
+                          {
+                            'featureType': 'arterial',
+                            'elementType': 'geometry.fill',
+                            'stylers': {
+                              'color': '#000000'
+                            }
+                          },
+                          {
+                            'featureType': 'arterial',
+                            'elementType': 'geometry.stroke',
+                            'stylers': {
+                              'color': '#0b3d51'
+                            }
+                          },
+                          {
+                            'featureType': 'local',
+                            'elementType': 'geometry',
+                            'stylers': {
+                              'color': '#000000'
+                            }
+                          },
+                          {
+                            'featureType': 'railway',
+                            'elementType': 'geometry.fill',
+                            'stylers': {
+                              'color': '#000000'
+                            }
+                          },
+                          {
+                            'featureType': 'railway',
+                            'elementType': 'geometry.stroke',
+                            'stylers': {
+                              'color': '#08304b'
+                            }
+                          },
+                          {
+                            'featureType': 'subway',
+                            'elementType': 'geometry',
+                            'stylers': {
+                              'lightness': -70
+                            }
+                          },
+                          {
+                            'featureType': 'building',
+                            'elementType': 'geometry.fill',
+                            'stylers': {
+                              'color': '#000000'
+                            }
+                          },
+                          {
+                            'featureType': 'all',
+                            'elementType': 'labels.text.fill',
+                            'stylers': {
+                              'color': '#857f7f'
+                            }
+                          },
+                          {
+                            'featureType': 'all',
+                            'elementType': 'labels.text.stroke',
+                            'stylers': {
+                              'color': '#000000'
+                            }
+                          },
+                          {
+                            'featureType': 'building',
+                            'elementType': 'geometry',
+                            'stylers': {
+                              'color': '#022338'
+                            }
+                          },
+                          {
+                            'featureType': 'green',
+                            'elementType': 'geometry',
+                            'stylers': {
+                              'color': '#062032'
+                            }
+                          },
+                          {
+                            'featureType': 'boundary',
+                            'elementType': 'all',
+                            'stylers': {
+                              'color': '#465b6c'
+                            }
+                          },
+                          {
+                            'featureType': 'manmade',
+                            'elementType': 'all',
+                            'stylers': {
+                              'color': '#022338'
+                            }
+                          },
+                          {
+                            'featureType': 'label',
+                            'elementType': 'all',
+                            'stylers': {
+                              'visibility': 'off'
+                            }
+                          }
+                        ]
+                      }
+                  },
+                  series: [{
+                      type: 'lines',
+                      coordinateSystem: 'bmap',
+                      polyline: false,
+                      data: busLines,
+                      silent: true,
+                      lineStyle: {
+                          normal: {
+                              // color: '#c23531',
+                              // color: 'rgb(200, 35, 45)',
+                              opacity: 0.2,
+                              width: 0.5
+                          }
+                      },
+                      progressiveThreshold: 300,
+                      progressive: 100
+                  }, {
+                      type: 'lines',
+                      coordinateSystem: 'bmap',
+                      polyline: true,
+                      data: busLines,
+                      lineStyle: {
+                          normal: {
+                              width: 0
+                          }
+                      },
+                      effect: {
+                          constantSpeed: 6,
+                          show: true,
+                          trailLength: 0.1,
+                          symbolSize: 3
+                      },
+                      zlevel: 1
+                  }]
+              });
+
+              if (!app.inNode) {
+                // 添加百度地图插件
+                var bmap = myChart.getModel().getComponent('bmap').getBMap();
+                bmap.addControl(new BMap.MapTypeControl());
+              }
+          });
+ </script>
+        
+</html>
+
+
+
